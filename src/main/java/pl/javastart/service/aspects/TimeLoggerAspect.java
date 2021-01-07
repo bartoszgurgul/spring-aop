@@ -13,7 +13,7 @@ import java.time.Instant;
 @Component
 public class TimeLoggerAspect {
 
-    @Around("execution(* pl.javastart.service.BookRepository.*(..))")
+    @Around("pl.javastart.service.aspects.AspectUtil.allBookRepositoryMethods()")
     public Object measureExecTime(ProceedingJoinPoint pjp) throws Throwable {
         Instant before = Instant.now();
 

@@ -1,30 +1,44 @@
 package pl.javastart.service.aspects;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
+import pl.javastart.model.Book;
+
+import java.util.Arrays;
 
 @Aspect
 @Component
 public class LoggerAspect {
 
-    @Before("execution(* pl.javastart.service.BookRepository.*(..))")
-    public void logInfoBefore() {
-        System.out.println("Log before");
+    @Before("pl.javastart.service.aspects.AspectUtil.allBookRepositoryMethods()")
+    public void logInfoBefore(JoinPoint joinPoint) {
+
+        System.out.printf("Log before %s with args: %s\n",
+                joinPoint.getSignature(),
+                Arrays.toString(joinPoint.getArgs()));
     }
 
-    @After("execution(* pl.javastart.service.BookRepository.*(..))")
+    @After("pl.javastart.service.aspects.AspectUtil.allBookRepositoryMethods()")
     public void logInfoAfter() {
         System.out.println("Method executed ");
     }
 
-    @AfterThrowing("execution(* pl.javastart.service.BookRepository.*(..))")
+    @AfterThrowing("pl.javastart.service.aspects.AspectUtil.allBookRepositoryMethods()")
     public void logError() {
         System.out.println("Method finished with error");
     }
 
-    @AfterReturning("execution(* pl.javastart.service.BookRepository.*(..))")
+    @AfterReturning("pl.javastart.service.aspects.AspectUtil.allBookRepositoryMethods()")
         public void logSuccess(){
             System.out.println("Method successfully returned");
         }
 
+
+    @AfterReturning(pointcut = "pl.javastart.service.aspects.AspectUtil.getBookRepository() && args(isbn)",
+            returning = "result")
+    public void logSuccess(JoinPoint joinPoint, String isbn, Book result) {
+        if(result != null)
+            System.out.printf("Method get() successfully returned value %s for isbn %s\n", result, isbn);
+    }
 }
